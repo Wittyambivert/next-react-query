@@ -1,11 +1,28 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import Head from "next/head";
+import { useState } from "react";
+import { useWeatherData } from "./api/weathertwo";
 
 export default function Home() {
+  const [city, setCity] = useState("abuja");
+  const { isLoading, data, error, refetch } = useWeatherData(city);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  const temperature = data?.days?.[0]?.temp;
+  const humidity = data?.days?.[0]?.humidity;
+  const location = data?.resolvedAddress;
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    refetch();
+  };
+
   return (
     <>
       <Head>
@@ -14,110 +31,87 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
+      <main className="phone">
+        <div className="container">
+          <div className="weather-side">
+            <div className="weather-gradient"></div>
+            <div className="date-container">
+              <h2 className="date-dayname">Tuesday</h2>
+              <span className="date-day">15 Jan 2019</span>
+              <i className="location-icon" data-feather="map-pin"></i>
+              <span className="location">{location}</span>
+            </div>
+            <div className="weather-container">
+              <i className="weather-icon" data-feather="sun"></i>
+              <h1 className="weather-temp">{temperature}</h1>
+              <h3 className="weather-desc">Sunny</h3>
+            </div>
           </div>
-        </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
+          <div className="info-side">
+            <div className="today-info-container">
+              <div className="today-info">
+                <div className="precipitation">
+                  {" "}
+                  <span className="title">PRECIPITATION</span>
+                  <span className="value">0 %</span>
+                  <div className="clear"></div>
+                </div>
+                <div className="humidity">
+                  {" "}
+                  <span className="title">HUMIDITY</span>
+                  <span className="value">{humidity}</span>
+                  <div className="clear"></div>
+                </div>
+                <div className="wind">
+                  {" "}
+                  <span className="title">WIND</span>
+                  <span className="value">0 km/h</span>
+                  <div className="clear"></div>
+                </div>
+              </div>
+            </div>
+            <div className="week-container">
+              <ul className="week-list">
+                <li className="active">
+                  <i className="day-icon" data-feather="sun"></i>
+                  <span className="day-name">Tue</span>
+                  <span className="day-temp">29°C</span>
+                </li>
+                <li>
+                  <i className="day-icon" data-feather="cloud"></i>
+                  <span className="day-name">Wed</span>
+                  <span className="day-temp">21°C</span>
+                </li>
+                <li>
+                  <i className="day-icon" data-feather="cloud-snow"></i>
+                  <span className="day-name">Thu</span>
+                  <span className="day-temp">08°C</span>
+                </li>
+                <li>
+                  <i className="day-icon" data-feather="cloud-rain"></i>
+                  <span className="day-name">Fry</span>
+                  <span className="day-temp">19°C</span>
+                </li>
+                <div className="clear"></div>
+              </ul>
+            </div>
+            <div className="location-container">
+              <form onSubmit={handleSearch}>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+                <button className="location-button" type="submit">
+                  {" "}
+                  <i data-feather="map-pin"></i>
+                  <span>Change location</span>
+                </button>
+              </form>
+            </div>
           </div>
-        </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
         </div>
       </main>
     </>
-  )
+  );
 }
